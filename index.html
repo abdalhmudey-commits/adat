@@ -1,32 +1,20 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مراقبة العادات</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
+<section id="habits" class="tab-content">
 
-<header>
-  <h1>مراقبة العادات</h1>
-</header>
+  <h2>إنشاء عادة جديدة</h2>
+  <input type="text" id="habitName" placeholder="اسم العادة">
+  <textarea id="habitMessage" placeholder="نص الإشعار"></textarea>
+  <input type="number" id="habitIntervalValue" placeholder="رقم المدة">
+  <select id="habitIntervalUnit">
+    <option value="minute">دقيقة</option>
+    <option value="hour">ساعة</option>
+    <option value="day">يوم</option>
+    <option value="week">أسبوع</option>
+    <option value="month">شهر</option>
+    <option value="year">سنة</option>
+  </select>
+  <input type="file" id="habitAudio" accept="audio/*">
+  <button onclick="addHabit()">إضافة العادة</button>
 
-<nav id="tabs">
-  <button onclick="showTab('home')">الرئيسية</button>
-  <button onclick="showTab('habits')">العادات</button>
-  <button onclick="showTab('adhkar')">الأذكار</button>
-  <button onclick="showTab('settings')">الإعدادات</button>
-</nav>
-
-<main>
-  <section id="home" class="tab-content"></section>
-  <section id="habits" class="tab-content"></section>
-  <section id="adhkar" class="tab-content"></section>
-  <section id="settings" class="tab-content"></section>
-</main>
-
-<script src="data.js"></script>
-<script src="app.js"></script>
-</body>
-</html>
+  <h2>عاداتي</h2>
+  <ul id="habitList"></ul>
+</section>
