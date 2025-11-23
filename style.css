@@ -1,0 +1,11 @@
+body { font-family: "Segoe UI", Tahoma, sans-serif; margin:0; padding:0; background:#f5f5f5; color:#333; }
+header { background:#4a90e2; color:white; padding:1rem; text-align:center; }
+nav { display:flex; justify-content:space-around; background:#e0e0e0; }
+nav button { padding:0.5rem 1rem; cursor:pointer; border:none; background:none; font-size:1rem; }
+.tab-content { display:none; padding:1rem; }
+.tab-content.active { display:block; }
+
+/* ثيم ليلي */
+body.night { background:#1e1e1e; color:#f5f5f5; }
+body.night header { background:#333; }
+body.night nav { background:#444; }
