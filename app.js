@@ -1,21 +1,92 @@
-function showTab(tabId){
-  const tabs = document.querySelectorAll('.tab-content');
-  tabs.forEach(t => t.classList.remove('active'));
-  document.getElementById(tabId).classList.add('active');
+// تحميل العادات من localStorage عند فتح التطبيق
+let habits = JSON.parse(localStorage.getItem('habits') || '[]');
+const habitList = document.getElementById('habitList');
+renderHabits();
+
+function addHabit() {
+  const name = document.getElementById('habitName').value.trim();
+  const message = document.getElementById('habitMessage').value.trim();
+  const intervalValue = parseInt(document.getElementById('habitIntervalValue').value);
+  const intervalUnit = document.getElementById('habitIntervalUnit').value;
+  const audioFile = document.getElementById('habitAudio').files[0];
+  
+  if (!name || !message || !intervalValue) {
+    alert("يرجى ملء كل الحقول");
+    return;
+  }
+
+  const habit = {
+    id: Date.now(),
+    name,
+    message,
+    intervalValue,
+    intervalUnit,
+    audio: audioFile ? URL.createObjectURL(audioFile) : null,
+    active: true
+  };
+  
+  habits.push(habit);
+  localStorage.setItem('habits', JSON.stringify(habits));
+  renderHabits();
+
+  // إعادة ضبط الحقول
+  document.getElementById('habitName').value = '';
+  document.getElementById('habitMessage').value = '';
+  document.getElementById('habitIntervalValue').value = '';
+  document.getElementById('habitAudio').value = '';
 }
 
-// عرض الحكم بشكل عشوائي في الرئيسية
-const home = document.getElementById('home');
-quotes.forEach(q => {
-  const p = document.createElement('p');
-  p.textContent = q;
-  home.appendChild(p);
-});
+function renderHabits() {
+  habitList.innerHTML = '';
+  habits.forEach(h => {
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <strong>${h.name}</strong> - ${h.message} 
+      [${h.intervalValue} ${h.intervalUnit}] 
+      <button onclick="toggleHabit(${h.id})">${h.active ? 'إيقاف' : 'تشغيل'}</button>
+      <button onclick="deleteHabit(${h.id})">حذف</button>
+    `;
+    habitList.appendChild(li);
 
-// التحكم بالثيم (نهاري/ليلي) - سيتم ربطه مع الإعدادات لاحقًا
-function setTheme(theme){
-  if(theme === 'night') document.body.classList.add('night');
-  else document.body.classList.remove('night');
+    if(h.active) startHabitTimer(h);
+  });
 }
 
-// إعدادات لاحقة: إضافة العادات، الأذكار، الذكاء الاصطناعي
+let timers = {}; // لتخزين مؤشرات setInterval
+
+function startHabitTimer(habit) {
+  if(timers[habit.id]) clearInterval(timers[habit.id]);
+  
+  let intervalMs = habit.intervalValue;
+  switch(habit.intervalUnit){
+    case 'minute': intervalMs *= 60000; break;
+    case 'hour': intervalMs *= 3600000; break;
+    case 'day': intervalMs *= 86400000; break;
+    case 'week': intervalMs *= 604800000; break;
+    case 'month': intervalMs *= 2592000000; break; // تقريبياً 30 يوم
+    case 'year': intervalMs *= 31536000000; break; // تقريبياً 365 يوم
+  }
+
+  timers[habit.id] = setInterval(() => {
+    alert(`${habit.name}\n${habit.message}`);
+    if(habit.audio){
+      const audio = new Audio(habit.audio);
+      audio.play();
+    }
+  }, intervalMs);
+}
+
+function toggleHabit(id){
+  const habit = habits.find(h => h.id === id);
+  habit.active = !habit.active;
+  if(!habit.active && timers[id]) clearInterval(timers[id]);
+  localStorage.setItem('habits', JSON.stringify(habits));
+  renderHabits();
+}
+
+function deleteHabit(id){
+  habits = habits.filter(h => h.id !== id);
+  if(timers[id]) clearInterval(timers[id]);
+  localStorage.setItem('habits', JSON.stringify(habits));
+  renderHabits();
+}
