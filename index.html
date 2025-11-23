@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تطبيق إمباور</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; color: #333; margin:0; padding:0; }
+  header { background: #4a90e2; color: white; padding: 1rem; text-align:center; font-size:1.5rem; }
+  section { padding:1rem; margin:0.5rem; background:white; border-radius:10px; box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+  button { background:#4a90e2; color:white; border:none; padding:0.5rem 1rem; border-radius:5px; cursor:pointer; margin-top:0.5rem; }
+  input, textarea { width:100%; padding:0.5rem; margin-top:0.5rem; border-radius:5px; border:1px solid #ccc; }
+  h2 { color:#4a90e2; }
+</style>
+</head>
+<body>
+
+<header>تطبيق إمباور - كسر العادات</header>
+
+<section id="habit-tracker">
+  <h2>كسر العادة</h2>
+  <label>اسم العادة التي تريد كسرها:</label>
+  <input type="text" id="habitName" placeholder="مثال: تصفح الهاتف">
+  
+  <label>كتابة رسالتك الشخصية:</label>
+  <textarea id="habitMessage" placeholder="اكتب رسالة تذكيرية لنفسك"></textarea>
+
+  <label>حدد التكرار بالدقائق:</label>
+  <input type="number" id="habitInterval" value="10">
+
+  <label>رفع تذكير صوتي (اختياري):</label>
+  <input type="file" id="habitAudio" accept="audio/*">
+
+  <button onclick="startHabit()">ابدأ التذكير</button>
+</section>
+
+<section id="notes">
+  <h2>الملاحظات</h2>
+  <textarea id="noteInput" placeholder="اكتب ملاحظتك هنا"></textarea>
+  <button onclick="saveNote()">حفظ الملاحظة</button>
+  <ul id="noteList"></ul>
+</section>
+
+<section id="adhkar">
+  <h2>أذكار الصباح والمساء</h2>
+  <ul id="adhkarList">
+    <li>سبحان الله</li>
+    <li>الحمد لله</li>
+    <li>الله أكبر</li>
+    <li>لا إله إلا الله</li>
+  </ul>
+</section>
+
+<script>
+  // تخزين الملاحظات
+  function saveNote() {
+    const input = document.getElementById('noteInput');
+    const list = document.getElementById('noteList');
+    if(input.value.trim() === "") return;
+    const li = document.createElement('li');
+    li.textContent = input.value;
+    list.appendChild(li);
+    let notes = JSON.parse(localStorage.getItem('notes') || '[]');
+    notes.push(input.value);
+    localStorage.setItem('notes', JSON.stringify(notes));
+    input.value = '';
+  }
+
+  // تحميل الملاحظات من localStorage عند فتح الصفحة
+  window.onload = function() {
+    let notes = JSON.parse(localStorage.getItem('notes') || '[]');
+    const list = document.getElementById('noteList');
+    notes.forEach(n => {
+      const li = document.createElement('li');
+      li.textContent = n;
+      list.appendChild(li);
+    });
+  }
+
+  // كسر العادة
+  let habitIntervalId;
+  function startHabit() {
+    const name = document.getElementById('habitName').value;
+    const msg = document.getElementById('habitMessage').value;
+    const interval = parseInt(document.getElementById('habitInterval').value) * 60000; // دقائق
+    const audioInput = document.getElementById('habitAudio');
+    let audio = null;
+    if(audioInput.files[0]){
+      audio = new Audio(URL.createObjectURL(audioInput.files[0]));
+    }
+
+    if(habitIntervalId) clearInterval(habitIntervalId);
+
+    habitIntervalId = setInterval(() => {
+      alert(name + "\n" + msg); // إشعار نصي
+      if(audio) audio.play(); // تشغيل الصوت إذا موجود
+    }, interval);
+
+    alert("تم بدء التذكير للعادة: " + name);
+  }
+
+  // أذكار (عداد بسيط)
+  const adhkarItems = document.querySelectorAll('#adhkarList li');
+  adhkarItems.forEach(li => {
+    li.addEventListener('click', () => {
+      let count = parseInt(li.dataset.count || '0') + 1;
+      li.dataset.count = count;
+      li.textContent = li.textContent.split(' ')[0] + ' (تم: ' + count + ')';
+    });
+  });
+</script>
+
+</body>
+</html>
